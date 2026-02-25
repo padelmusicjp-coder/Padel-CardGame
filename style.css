@@ -1033,12 +1033,12 @@ header#hud {
   }
 
   40% {
-    transform: translate(-25vw, -30vh);
+    transform: translate(var(--tx, -25vw), var(--ty, -30vh));
     opacity: 1;
   }
 
   60% {
-    transform: translate(-25vw, -30vh) scale(0.85);
+    transform: translate(var(--tx, -25vw), var(--ty, -30vh)) scale(0.85);
     opacity: 1;
   }
 
@@ -1077,12 +1077,12 @@ header#hud {
   }
 
   40% {
-    transform: translate(25vw, 30vh) rotate(180deg);
+    transform: translate(var(--tx, 25vw), var(--ty, 30vh)) rotate(180deg);
     opacity: 1;
   }
 
   60% {
-    transform: translate(25vw, 30vh) rotate(180deg) scale(0.85);
+    transform: translate(var(--tx, 25vw), var(--ty, 30vh)) rotate(180deg) scale(0.85);
     opacity: 1;
   }
 

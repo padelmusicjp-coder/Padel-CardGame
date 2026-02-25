@@ -39,6 +39,26 @@ function triggerHandAnimation(team, type) {
     el.id = "handAnimB";
   }
 
+  // Calculate dynamic tx and ty for play animations to target the precise slot
+  if (type === 'play') {
+    const actionTarget = document.getElementById(`action${team}`);
+    if (actionTarget) {
+      const aRect = container.getBoundingClientRect();
+      const tRect = actionTarget.getBoundingClientRect();
+      const startX = aRect.width / 2;
+      const startY = team === "A" ? aRect.height : 0;
+
+      const targetX = tRect.left + tRect.width / 2 - aRect.left;
+      const targetY = tRect.top + tRect.height / 2 - aRect.top;
+
+      let tx = targetX - startX;
+      let ty = targetY - startY;
+
+      el.style.setProperty('--tx', `${tx}px`);
+      el.style.setProperty('--ty', `${ty}px`);
+    }
+  }
+
   container.appendChild(el);
 
   // Remove after animation completes
@@ -521,8 +541,8 @@ function renderHand() {
   const actionContainer = document.getElementById("actionContainer");
   if (actionContainer) {
     actionContainer.innerHTML = "";
-    // 自分のターンで、手札に出せるカードがない（が1枚以上ある）場合、失点ボタンを表示
-    if (state.turnTeam === "A" && !hasPlayable && state.hands.A.length > 0) {
+    // 自分のターンで、手札に出せるカードがない（が1枚以上ある）場合、かつアニメーション中でない場合、失点ボタンを表示
+    if (state.turnTeam === "A" && !hasPlayable && state.hands.A.length > 0 && !state.isAnimating) {
       const giveUpBtn = document.createElement("button");
       giveUpBtn.textContent = "出せるカードがない (失点)";
       // 横長のフル幅ボタンのスタイルに変更

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PADEL RALLY DOMINION</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- Point Overlay Animation -->
+        <div id="pointOverlay" class="hidden">
+            <div id="flashScreen"></div>
+            <h1 id="pointText">POINT!</h1>
+        </div>
+
+        <!-- 上：HUD（スコア、サーブ、メニュー） -->
+        <header id="hud">
+            <div class="score-board">
+                <div class="team-score">A: <span id="scoreA">0</span></div>
+                <div class="serve-indicator" id="serveIndicator">SERVE: A</div>
+                <div class="team-score">B: <span id="scoreB">0</span></div>
+            </div>
+            <div class="menu-btn" id="btnShowChart" title="相性表を見る">📊</div>
+        </header>
+
+        <!-- 相手（AI）の手札 -->
+        <section id="enemy-hand-container" class="hand-container"
+            style="transform: scale(0.5); transform-origin: top center; height: 120px; margin-top: 80px; margin-bottom: -100px; justify-content: center; overflow: visible;">
+            <!-- 裏向きのカードがここに生成される -->
+        </section>
+
+        <!-- 次：ラリー履歴（直近3〜6手） -->
+        <section id="history-container">
+            <div id="historyList"></div>
+        </section>
+
+        <!-- プレイ内容表示（互いの選択カード） -->
+        <section id="action-display">
+            <div class="action-card A-action">
+                <div class="team-label">A</div>
+                <div id="actionA" class="action-content">Waiting...</div>
+            </div>
+            <div class="action-card B-action">
+                <div class="team-label">B</div>
+                <div id="actionB" class="action-content">Waiting...</div>
+            </div>
+        </section>
+
+
+
+        <!-- 下：操作（ドローボタン、手札） -->
+        <section id="controls-container">
+            <div class="hand-container" id="handContainer">
+                <!-- カードがここに生成される -->
+            </div>
+            <div id="actionContainer" style="margin-top: 10px; text-align: center;">
+                <!-- アクションボタンが生成される -->
+            </div>
+        </section>
+
+        <!-- 最下：ログ（1行メッセージ） -->
+        <footer id="log-container">
+            <div id="gameLog">Game Started.</div>
+        </footer>
+
+        <!-- 相性表モーダル -->
+        <div id="chartModal" class="modal hidden">
+            <div class="modal-content glass">
+                <span class="close-btn" id="btnCloseChart">&times;</span>
+                <h2 style="text-align:center; color:#0ff; margin-bottom:15px; text-shadow:0 0 10px #0ff;">カード相性表</h2>
+                <div id="chartContainer" style="overflow-y:auto; max-height:70vh;">
+                    <!-- JSでテーブルを生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>

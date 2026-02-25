@@ -16,14 +16,31 @@
             <h1 id="pointText">POINT!</h1>
         </div>
 
-        <!-- 上：HUD（スコア、サーブ、メニュー） -->
+        <!-- Coin Toss Overlay Animation -->
+        <div id="coinTossOverlay" class="hidden">
+            <div id="coinScreen"></div>
+            <div id="coinContainer">
+                <div id="coinElement" class="coin"></div>
+            </div>
+            <h2 id="coinText">COIN TOSS</h2>
+        </div>
+
         <header id="hud">
             <div class="score-board">
                 <div class="team-score">A: <span id="scoreA">0</span></div>
                 <div class="serve-indicator" id="serveIndicator">SERVE: A</div>
                 <div class="team-score">B: <span id="scoreB">0</span></div>
             </div>
-            <div class="menu-btn" id="btnShowChart" title="相性表を見る">📊</div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <select id="bgmVolume" title="BGM音量"
+                    style="background: rgba(0,0,0,0.5); color: #0ff; border: 1px solid #0ff; border-radius: 4px; padding: 4px; font-size: 12px; font-weight: bold; cursor: pointer; outline: none;">
+                    <option value="high">大</option>
+                    <option value="med" selected>中</option>
+                    <option value="low">小</option>
+                    <option value="off">オフ</option>
+                </select>
+                <div class="menu-btn" id="btnShowChart" title="相性表を見る">📊</div>
+            </div>
         </header>
 
         <!-- 相手（AI）の手札 -->

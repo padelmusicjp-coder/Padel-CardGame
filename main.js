@@ -1,5 +1,5 @@
 import { CARD_ID, CARD_DEFS, buildDeck81, shuffleInPlace, canPlay } from './cards.js';
-import { playSoundDraw, playSoundPlayCard, playSoundError, playSoundLose, playSoundPoint, playSoundClick, playSoundSpecial, playSoundMatchWin } from './audio.js';
+import { playSoundDraw, playSoundPlayCard, playSoundError, playSoundLose, playSoundPoint, playSoundClick, playSoundSpecial, playSoundMatchWin, setBGMVolume } from './audio.js';
 
 // --- Game State Definition ---
 let state = {
@@ -22,8 +22,60 @@ function getCardDef(id) {
 // --- Init & Deck ---
 function initGame() {
   generateChart();
-  resetPoint();
-  logMessage("Game Started. 1v1 BATTLE.");
+  document.getElementById("scoreA").textContent = 0;
+  document.getElementById("scoreB").textContent = 0;
+  document.getElementById("actionA").innerHTML = '<span style="color:#777">Waiting...</span>';
+  document.getElementById("actionB").innerHTML = '<span style="color:#777">Waiting...</span>';
+
+  startWithCoinToss();
+}
+
+function startWithCoinToss() {
+  const overlay = document.getElementById("coinTossOverlay");
+  const coinContainer = document.getElementById("coinContainer");
+  const coinEl = document.getElementById("coinElement");
+  const cText = document.getElementById("coinText");
+
+  if (!overlay || !coinContainer || !coinEl || !cText) {
+    resetPoint();
+    return;
+  }
+
+  overlay.className = "anim-toss-start";
+  coinEl.className = "coin anim-toss-spinning";
+  cText.textContent = "COIN TOSS";
+
+  playSoundSpecial(); // Use special sound for toss
+
+  setTimeout(() => {
+    // Determine winner
+    const isA = Math.random() < 0.5;
+    const winner = isA ? "A" : "B";
+    state.serve = winner;
+
+    // Stop spinning and show result
+    coinEl.className = "coin"; // Remove spin
+    overlay.className = `anim-toss-start anim-toss-result${winner}`;
+    coinEl.textContent = winner;
+
+    cText.style.opacity = "1";
+    cText.textContent = `SERVE: ${winner}!`;
+    cText.style.animation = "none"; // Stop fade
+
+    playSoundPoint(); // Result sound
+
+    setTimeout(() => {
+      overlay.className = "hidden";
+      // Clear inline styles applied by animation override
+      cText.style.opacity = "";
+      cText.style.animation = "";
+      coinEl.textContent = "";
+
+      resetPoint();
+      logMessage(`Game Started. 1v1 BATTLE. ${winner} Serves.`);
+    }, 2000);
+
+  }, 2000); // 2 seconds tossing
 }
 
 function generateDeck() {
@@ -154,12 +206,28 @@ function playCard(cardId, team) {
   }
 
   // Record Timeline
+  const previousCard = state.lastCard;
+
   state.timeline.push({ team, cardId });
   if (state.timeline.length > 6) state.timeline.shift();
   state.lastCard = cardId;
 
   // --- 特殊カード効果の適用 ---
   let isSpecial = false;
+
+  if (cardId === CARD_ID.BLANCA) {
+    isSpecial = true;
+    if (previousCard === CARD_ID.PALA_ROTA || previousCard === CARD_ID.RED) {
+      playSoundSpecial();
+      logMessage(`[CARTA BLANCA] ${team}がジョーカーで反撃！強引にポイントを奪い取った！`);
+      state.turnTeam = "NONE";
+      renderAll();
+      pointTo(team);
+      return;
+    }
+  }
+
+
 
   if (cardId === CARD_ID.NEVERA) {
     isSpecial = true;
@@ -189,7 +257,7 @@ function playCard(cardId, team) {
   if (isSpecial) {
     playSoundSpecial();
   } else {
-    playSoundPlayCard();
+    playSoundPlayCard(cardId);
   }
 
   // 自動でドローしてターンを終了する
@@ -493,6 +561,10 @@ document.getElementById("btnCloseChart").onclick = () => {
   playSoundClick();
   document.getElementById("chartModal").classList.add("hidden");
 };
+
+document.getElementById("bgmVolume").addEventListener("change", (e) => {
+  setBGMVolume(e.target.value);
+});
 
 // BOOT
 initGame();

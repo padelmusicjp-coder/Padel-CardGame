@@ -77,7 +77,7 @@ export const CARD_DEFS = {
         color: "blue",
         tier: 1,
         role: "defense",
-        descriptionJa: "安全に返してラリーをつなぐ基本の守備。"
+        descriptionJa: "安全に相手コートへ返す基本の守備。ラリーを無理なくつなぐ。"
     },
     [CARD_ID.GLOBO]: {
         id: CARD_ID.GLOBO,
@@ -86,7 +86,7 @@ export const CARD_DEFS = {
         color: "blue",
         tier: 2,
         role: "defense",
-        descriptionJa: "相手を下げて時間を作る。レマテ×3を返せる貴重な守備。"
+        descriptionJa: "相手を後ろに下げて時間を作る。最強の『レマテ×3』を返せる貴重なカード。"
     },
     [CARD_ID.MURO]: {
         id: CARD_ID.MURO,
@@ -95,7 +95,7 @@ export const CARD_DEFS = {
         color: "blue",
         tier: 99, // PRO
         role: "defense",
-        descriptionJa: "多くの攻撃に対応できる万能守備。レマテ×3も返せる。"
+        descriptionJa: "あらゆる攻撃を弾き返す万能の壁。『レマテ×3』や強打もブロック可能。"
     },
 
     // Green
@@ -106,7 +106,7 @@ export const CARD_DEFS = {
         color: "green",
         tier: 1,
         role: "transition",
-        descriptionJa: "攻撃を止めつつ切り返すトランジション。赤系に強い。"
+        descriptionJa: "強烈な攻撃を前衛でブロックし、守備から攻撃へと切り替える。"
     },
     [CARD_ID.PASSING]: {
         id: CARD_ID.PASSING,
@@ -115,7 +115,7 @@ export const CARD_DEFS = {
         color: "green",
         tier: 2,
         role: "transition",
-        descriptionJa: "前衛の横を抜く/流れを変える。守備や攻撃(赤)にもつながる。"
+        descriptionJa: "前衛の横を鋭く抜くショット。赤属性の攻撃に対してカウンターとなる。"
     },
     [CARD_ID.SALGO]: {
         id: CARD_ID.SALGO,
@@ -124,7 +124,7 @@ export const CARD_DEFS = {
         color: "green",
         tier: 99, // PRO
         role: "transition",
-        descriptionJa: "超限定の強カード。返せるのは同カード・レマテ×3・特殊など。"
+        descriptionJa: "コート外からの奇跡の返球。レマテ×3など一部の致命的ショットから救出する。"
     },
 
     // Red
@@ -135,7 +135,7 @@ export const CARD_DEFS = {
         color: "red",
         tier: 1,
         role: "attack",
-        descriptionJa: "前を維持しながら攻める。返せるのは基本的に青のみ。"
+        descriptionJa: "前衛を保ちながら相手を牽制する、パデル特有の守備的スマッシュ。"
     },
     [CARD_ID.VOLEA]: {
         id: CARD_ID.VOLEA,
@@ -144,7 +144,7 @@ export const CARD_DEFS = {
         color: "red",
         tier: 1,
         role: "attack",
-        descriptionJa: "前で圧をかける攻撃。守備(青)やブロックで返されやすい。"
+        descriptionJa: "ネット前で素早く打ち込み、相手にプレッシャーを与える攻撃。"
     },
     [CARD_ID.BAJADA]: {
         id: CARD_ID.BAJADA,
@@ -153,7 +153,7 @@ export const CARD_DEFS = {
         color: "red",
         tier: 1,
         role: "attack",
-        descriptionJa: "壁を使って攻撃に転じる。返せるのは基本青のみ。"
+        descriptionJa: "壁の跳ね返りを利用して、後方から一気に強い攻撃に転じる。"
     },
     [CARD_ID.ENTERRADORA]: {
         id: CARD_ID.ENTERRADORA,
@@ -162,7 +162,7 @@ export const CARD_DEFS = {
         color: "red",
         tier: 99, // PRO
         role: "attack",
-        descriptionJa: "強い攻撃。守備(青)やブロックで返せる。"
+        descriptionJa: "相手コートにボールを鋭く叩きつける強打。ブロックされやすい。"
     },
     [CARD_ID.REMATE]: {
         id: CARD_ID.REMATE,
@@ -171,7 +171,7 @@ export const CARD_DEFS = {
         color: "red",
         tier: 2,
         role: "attack",
-        descriptionJa: "最強攻撃。返せるのはロブ/鉄壁/特殊のみ。"
+        descriptionJa: "ポイントを決定づける最強のスマッシュ。ごく一部のカードでしか防げない。"
     },
 
     // Yellow
@@ -182,7 +182,7 @@ export const CARD_DEFS = {
         color: "yellow",
         tier: 0,
         role: "special",
-        descriptionJa: "特殊。基本ワイルド（いつでも出せる）。効果は実装側で。"
+        descriptionJa: "相手の行動を凍結してラリーの主導権をリセットする。次は何を出しても良い。"
     },
     [CARD_ID.PALA_ROTA]: {
         id: CARD_ID.PALA_ROTA,
@@ -191,7 +191,7 @@ export const CARD_DEFS = {
         color: "yellow",
         tier: 0,
         role: "special",
-        descriptionJa: "特殊。基本ワイルド（いつでも出せる）。効果は実装側で。"
+        descriptionJa: "相手のラケットが破損！返球不能となり、そのまま自分の得点となる。"
     },
     [CARD_ID.PINCHADA]: {
         id: CARD_ID.PINCHADA,
@@ -200,7 +200,7 @@ export const CARD_DEFS = {
         color: "yellow",
         tier: 0,
         role: "special",
-        descriptionJa: "特殊。基本ワイルド（いつでも出せる）。効果は実装側で。"
+        descriptionJa: "試合球がパンクし、強制的にラリーが中断される。ノーカウントでやり直し。"
     },
     [CARD_ID.RED]: {
         id: CARD_ID.RED,
@@ -209,7 +209,7 @@ export const CARD_DEFS = {
         color: "yellow",
         tier: 0,
         role: "special_restricted",
-        descriptionJa: "特殊（制限あり）。場が赤/黄/緑PROのときだけ出せる。"
+        descriptionJa: "相手が反則！即座に自分の得点となる。（赤/黄/緑PROの直後のみ使用可）"
     },
     [CARD_ID.BLANCA]: {
         id: CARD_ID.BLANCA,
@@ -218,7 +218,7 @@ export const CARD_DEFS = {
         color: "yellow",
         tier: 0,
         role: "special",
-        descriptionJa: "特殊。基本ワイルド（いつでも出せる）。使い方は実装側で。"
+        descriptionJa: "万能なジョーカー。ラリーの流れをリセットし、次は何を出しても良い。"
     }
 };
 
@@ -295,8 +295,12 @@ export function canPlay(nextId, currentId) {
     }
 
     // 1) 特殊（黄）の基本ルール
-    // ラケット破損、ボールがパンク、ネットタッチ は即時得点ややり直し（ラリー終了）のため、次に出せるカードは存在しない
+    // ラケット破損、ネットタッチ は即時得点、ボールのパンクはやり直し（ラリー終了）のトリガーとなる
     if (currentId === CARD_ID.PALA_ROTA || currentId === CARD_ID.PINCHADA || currentId === CARD_ID.RED) {
+        // ただしジョーカー（白紙）だけは、ラケット破損とネットタッチに対してカウンターとして出せる
+        if (nextId === CARD_ID.BLANCA && currentId !== CARD_ID.PINCHADA) {
+            return true;
+        }
         return false;
     }
 

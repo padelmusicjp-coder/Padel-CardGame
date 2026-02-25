@@ -13,10 +13,40 @@ let state = {
   timeline: [],   // {team, cardId}
   lastCard: "SERVICIO", // 最初はサーブから
   selectedHandIndex: null, // 追加: 選択中のカードインデックス
+  justDrawnIndex: { A: null, B: null },
+  isAnimating: false,
+  shotCount: 0,
+  gameStats: { totalShots: 0, maxShots: 0, minShots: 9999, winReasons: { A: {}, B: {} } }
 };
 
 function getCardDef(id) {
   return CARD_DEFS[id];
+}
+
+// --- Hand Animation ---
+function triggerHandAnimation(team, type) {
+  const container = document.getElementById("app");
+  if (!container) return;
+
+  const el = document.createElement("div");
+  el.className = `hand-anim anim-${type}-${team}`;
+  el.textContent = "🖐️";
+
+  // App-specific positioning rules matching the CSS
+  if (team === "A") {
+    el.id = "handAnimA";
+  } else {
+    el.id = "handAnimB";
+  }
+
+  container.appendChild(el);
+
+  // Remove after animation completes
+  setTimeout(() => {
+    if (el && el.parentNode) {
+      el.remove();
+    }
+  }, 600);
 }
 
 // --- Init & Deck ---
@@ -91,7 +121,10 @@ function drawCard(team, silent = false) {
   }
   if (state.deck.length > 0) {
     state.hands[team].push(state.deck.pop());
-    if (!silent) playSoundDraw();
+    if (!silent) {
+      playSoundDraw();
+      triggerHandAnimation(team, 'draw');
+    }
   }
 }
 
@@ -102,6 +135,9 @@ function resetPoint() {
   state.lastCard = "SERVICIO";
   state.turnTeam = state.serve;
   state.selectedHandIndex = null;
+  state.justDrawnIndex = { A: null, B: null };
+  state.isAnimating = false;
+  state.shotCount = 0;
 
   // 初期ドロー5枚
   for (let i = 0; i < 5; i++) {
@@ -120,20 +156,111 @@ function pointTo(winner) {
   state.totalPoints++;
   state.serve = (state.totalPoints % 2 === 0) ? "A" : "B";
 
-  if (state.score.A >= 7) {
-    playSoundMatchWin();
-    setTimeout(() => {
-      alert("Player A WINS THE MATCH!");
-      location.reload();
-    }, 500);
-    return;
+  // HUDのスコアやPTSをなるべく早く反映
+  updateHUD();
+
+  // Track winning shot for the winner
+  let winningCardId = "UNKNOWN";
+  for (let i = state.timeline.length - 1; i >= 0; i--) {
+    if (state.timeline[i].team === winner) {
+      winningCardId = state.timeline[i].cardId;
+      break;
+    }
   }
-  if (state.score.B >= 7) {
-    playSoundLose();
+
+  if (winningCardId !== "UNKNOWN") {
+    if (!state.gameStats.winReasons[winner][winningCardId]) {
+      state.gameStats.winReasons[winner][winningCardId] = 0;
+    }
+    state.gameStats.winReasons[winner][winningCardId]++;
+  }
+
+  // Update overall rally stats
+  if (state.shotCount > 0) {
+    state.gameStats.totalShots += state.shotCount;
+    if (state.shotCount > state.gameStats.maxShots) state.gameStats.maxShots = state.shotCount;
+    if (state.shotCount < state.gameStats.minShots) state.gameStats.minShots = state.shotCount;
+  }
+
+  if (state.score.A >= 7 || state.score.B >= 7) {
+    const isPlayerWin = state.score.A >= 7;
+    if (isPlayerWin) {
+      playSoundMatchWin();
+    } else {
+      playSoundLose();
+    }
+
+    const overlay = document.getElementById("matchResultOverlay");
+    const title = document.getElementById("matchResultTitle");
+    const sub = document.getElementById("matchResultSub");
+
     setTimeout(() => {
-      alert("Player B WINS THE MATCH!");
-      location.reload();
-    }, 500);
+      overlay.className = isPlayerWin ? "result-win" : "result-lose";
+      title.textContent = isPlayerWin ? "YOU WIN!" : "YOU LOSE...";
+      sub.textContent = `FINAL SCORE: ${state.score.A} - ${state.score.B}`;
+
+      const stats = document.getElementById("matchResultStats");
+      if (stats) {
+        // Prevent showing 9999 if minShots wasn't updated
+        const displayMin = state.gameStats.minShots === 9999 ? 0 : state.gameStats.minShots;
+
+        const getTop3 = (team) => {
+          const reasons = state.gameStats.winReasons[team];
+          const sorted = Object.entries(reasons).sort((a, b) => b[1] - a[1]).slice(0, 3);
+          if (sorted.length === 0) return `<div style="font-size:14px; opacity:0.6; text-align:center; margin-top:10px;">なし</div>`;
+          return sorted.map((s, i) => `
+            <div style="font-size:15px; display:flex; justify-content:space-between; margin-top:6px;">
+              <span>${i + 1}. ${getCardDef(s[0]).nameJa}</span> 
+              <span style="color:#0ff; font-weight:bold;">${s[1]}回</span>
+            </div>
+          `).join('');
+        };
+
+        stats.innerHTML = `
+          <div style="padding-bottom:15px; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.3);">
+            <div class="stat-row"><span>総プレイショット:</span> <span>${state.gameStats.totalShots}</span></div>
+            <div class="stat-row"><span>最大ラリー数:</span> <span>${state.gameStats.maxShots}</span></div>
+            <div class="stat-row"><span>最小ラリー数:</span> <span>${displayMin}</span></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; gap:20px;">
+            <div style="flex:1;">
+              <div style="font-size:14px; color:#ff4081; font-weight:bold; border-bottom:1px solid #ff4081; padding-bottom:4px;">A (You) 決まり手</div>
+              ${getTop3("A")}
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:14px; color:#00f2fe; font-weight:bold; border-bottom:1px solid #00f2fe; padding-bottom:4px;">B (COM) 決まり手</div>
+              ${getTop3("B")}
+            </div>
+          </div>
+        `;
+      }
+
+      // Celebratory particles for win
+      if (isPlayerWin) {
+        const container = document.getElementById("app");
+        for (let i = 0; i < 60; i++) {
+          setTimeout(() => {
+            const p = document.createElement("div");
+            p.className = "particle";
+            const colors = ['#ffeb3b', '#ff4081', '#00f2fe', '#0ff'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            p.style.backgroundColor = color;
+            p.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}`;
+
+            p.style.top = `${10 + Math.random() * 80}%`;
+            p.style.left = `${10 + Math.random() * 80}%`;
+
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = 50 + Math.random() * 200;
+            p.style.setProperty("--tx", `${Math.cos(angle) * velocity}px`);
+            p.style.setProperty("--ty", `${Math.sin(angle) * velocity}px`);
+
+            container.appendChild(p);
+            setTimeout(() => p.remove(), 1000);
+          }, i * 40); // cascading interval
+        }
+      }
+    }, 1000); // Wait 1 sec for final point animation to settle
     return;
   }
 
@@ -183,8 +310,9 @@ function pointTo(winner) {
 
 // --- Game Logic ---
 function playCard(cardId, team) {
-  if (state.turnTeam !== team) return;
+  if (state.turnTeam !== team || state.isAnimating) return;
   state.selectedHandIndex = null;
+  state.isAnimating = true;
 
   // Can Play Compatibility Check
   if (state.lastCard && state.lastCard !== "SERVICIO") {
@@ -211,6 +339,7 @@ function playCard(cardId, team) {
   state.timeline.push({ team, cardId });
   if (state.timeline.length > 6) state.timeline.shift();
   state.lastCard = cardId;
+  state.shotCount++;
 
   // --- 特殊カード効果の適用 ---
   let isSpecial = false;
@@ -249,6 +378,7 @@ function playCard(cardId, team) {
     playSoundSpecial();
     logMessage(`[PINCHADA] ボールがパンクしました！ノーカウントでポイントをやり直します。`);
     state.turnTeam = "NONE"; // 操作をロック
+    state.isAnimating = false;
     renderAll();
     setTimeout(resetPoint, 2000);
     return; // ターン終了処理へ進まない
@@ -260,9 +390,22 @@ function playCard(cardId, team) {
     playSoundPlayCard(cardId);
   }
 
-  // 自動でドローしてターンを終了する
-  drawCard(team);
-  endTurn(team);
+  triggerHandAnimation(team, 'play');
+  renderAll();
+
+  // カードを出したアニメーション（600ms）完了後にドローする
+  setTimeout(() => {
+    drawCard(team);
+    state.justDrawnIndex[team] = state.hands[team].length - 1;
+    renderAll();
+
+    // ドローアニメーション（600ms）完了後にターンを終了する
+    setTimeout(() => {
+      state.justDrawnIndex[team] = null;
+      state.isAnimating = false;
+      endTurn(team);
+    }, 600);
+  }, 600);
 }
 
 function endTurn(currentTeam) {
@@ -301,7 +444,7 @@ function renderAll() {
 function updateHUD() {
   document.getElementById("scoreA").textContent = state.score.A;
   document.getElementById("scoreB").textContent = state.score.B;
-  document.getElementById("serveIndicator").textContent = `TURN: ${state.turnTeam} | PTS: ${state.totalPoints}`;
+  document.getElementById("serveIndicator").textContent = `TURN: ${state.turnTeam} | PTS: ${state.totalPoints} | SHOTS: ${state.shotCount}`;
 }
 
 function renderHand() {
@@ -317,11 +460,13 @@ function renderHand() {
 
     const isCompatible = (state.lastCard === "SERVICIO" || !state.lastCard || canPlay(c, state.lastCard));
     // 自分のターンのときだけプレイ可能
-    const isPlayable = isCompatible && state.turnTeam === "A";
+    const isPlayable = isCompatible && state.turnTeam === "A" && !state.isAnimating;
     if (isCompatible) hasPlayable = true;
 
+    // Drawn Highlight
+    const isNew = state.justDrawnIndex.A === index;
     const cardEl = document.createElement("div");
-    cardEl.className = `card ${!isPlayable ? 'disabled' : ''} ${state.selectedHandIndex === index ? 'selected' : ''}`;
+    cardEl.className = `card ${!isPlayable ? 'disabled' : ''} ${state.selectedHandIndex === index ? 'selected' : ''} ${isNew ? 'newly-drawn' : ''}`;
 
     const angle = (renderIndex - 2) * 8;
     const xOffset = (renderIndex - 2) * 45;
@@ -397,9 +542,10 @@ function renderHand() {
 
     // Bの持っている手札の枚数分だけ裏向きのカードを描画
     let enemyRenderIndex = 0;
-    state.hands.B.forEach(() => {
+    state.hands.B.forEach((_, index) => {
+      const isNew = state.justDrawnIndex.B === index;
       const cardEl = document.createElement("div");
-      cardEl.className = "card face-down disabled";
+      cardEl.className = `card face-down disabled ${isNew ? 'newly-drawn' : ''}`;
 
       const angle = (enemyRenderIndex - 2) * 8;
       const xOffset = (enemyRenderIndex - 2) * 45;
@@ -564,6 +710,11 @@ document.getElementById("btnCloseChart").onclick = () => {
 
 document.getElementById("bgmVolume").addEventListener("change", (e) => {
   setBGMVolume(e.target.value);
+});
+
+document.getElementById("btnPlayAgain").addEventListener("click", () => {
+  playSoundClick();
+  location.reload();
 });
 
 // BOOT

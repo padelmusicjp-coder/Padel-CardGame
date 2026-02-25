@@ -495,6 +495,32 @@ header#hud {
   z-index: 100 !important;
 }
 
+.card.newly-drawn {
+  animation: newlyDrawnPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-color: #0ff;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+  z-index: 101 !important;
+}
+
+@keyframes newlyDrawnPop {
+  0% {
+    transform: translateX(calc(var(--base-x) + 50px)) translateY(100px) scale(0.5);
+    opacity: 0;
+  }
+
+  40% {
+    transform: translateX(var(--base-x)) translateY(-30px) scale(1.1) rotate(0deg);
+    opacity: 1;
+    border-color: #0ff;
+    box-shadow: 0 15px 40px rgba(0, 255, 255, 0.9);
+  }
+
+  100% {
+    transform: translateX(var(--base-x)) rotate(var(--base-rotate));
+    opacity: 1;
+  }
+}
+
 .hand-container .card:hover:not(.disabled):not(.selected) {
   transform: translateX(var(--base-x)) translateY(-15px) scale(1.05) rotate(var(--base-rotate)) !important;
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 255, 0.1);
@@ -934,5 +960,262 @@ header#hud {
   100% {
     opacity: 0;
     transform: translateY(-20px);
+  }
+}
+
+/* ------------ Hand Animations ------------ */
+.hand-anim {
+  position: absolute;
+  font-size: 60px;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#handAnimA {
+  bottom: -20px;
+  left: 50%;
+  margin-left: -30px;
+}
+
+#handAnimB {
+  top: -20px;
+  left: 50%;
+  margin-left: -30px;
+}
+
+.anim-draw-A {
+  animation: handDrawA 0.5s cubic-bezier(0.175, 0.885, 0.32, 1) forwards;
+}
+
+.anim-play-A {
+  animation: handPlayA 0.5s cubic-bezier(0.175, 0.885, 0.32, 1) forwards;
+}
+
+.anim-draw-B {
+  animation: handDrawB 0.5s cubic-bezier(0.175, 0.885, 0.32, 1) forwards;
+}
+
+.anim-play-B {
+  animation: handPlayB 0.5s cubic-bezier(0.175, 0.885, 0.32, 1) forwards;
+}
+
+@keyframes handDrawA {
+  0% {
+    transform: translate(50px, 100px) rotate(-15deg);
+    opacity: 0;
+  }
+
+  40% {
+    transform: translate(50px, -20px) rotate(-15deg);
+    opacity: 1;
+  }
+
+  60% {
+    transform: translate(50px, -20px) rotate(-15deg) scale(0.85);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(50px, 100px) rotate(-15deg);
+    opacity: 0;
+  }
+}
+
+@keyframes handPlayA {
+  0% {
+    transform: translate(0px, 100px);
+    opacity: 0;
+  }
+
+  40% {
+    transform: translate(-25vw, -30vh);
+    opacity: 1;
+  }
+
+  60% {
+    transform: translate(-25vw, -30vh) scale(0.85);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(0px, 100px);
+    opacity: 0;
+  }
+}
+
+@keyframes handDrawB {
+  0% {
+    transform: translate(-50px, -100px) rotate(165deg);
+    opacity: 0;
+  }
+
+  40% {
+    transform: translate(-50px, 20px) rotate(165deg);
+    opacity: 1;
+  }
+
+  60% {
+    transform: translate(-50px, 20px) rotate(165deg) scale(0.85);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50px, -100px) rotate(165deg);
+    opacity: 0;
+  }
+}
+
+@keyframes handPlayB {
+  0% {
+    transform: translate(0px, -100px) rotate(180deg);
+    opacity: 0;
+  }
+
+  40% {
+    transform: translate(25vw, 30vh) rotate(180deg);
+    opacity: 1;
+  }
+
+  60% {
+    transform: translate(25vw, 30vh) rotate(180deg) scale(0.85);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(0px, -100px) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+/* ------------ Match Result Overlay ------------ */
+#matchResultOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+#matchResultOverlay:not(.hidden) {
+  opacity: 1;
+}
+
+#matchResultTitle {
+  font-size: 72px;
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin: 0;
+  text-align: center;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  animation: resultPop 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+#matchResultSub {
+  font-size: 24px;
+  color: #fff;
+  margin: 20px 0;
+  font-weight: bold;
+  opacity: 0;
+  animation: popIn 1s 1s ease-in-out forwards;
+}
+
+#matchResultStats {
+  margin-bottom: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px 30px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 18px;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  animation: popIn 1s 1.2s ease-in-out forwards;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  min-width: 300px;
+  margin-bottom: 8px;
+}
+
+.stat-row span:last-child {
+  font-weight: bold;
+  color: #0ff;
+}
+
+#btnPlayAgain {
+  padding: 15px 40px;
+  font-size: 20px;
+  font-weight: 900;
+  color: #000;
+  background: linear-gradient(135deg, #0ff, #00bfff);
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+  opacity: 0;
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: popIn 0.5s 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+#btnPlayAgain:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 30px rgba(0, 255, 255, 1);
+}
+
+.result-win #matchResultTitle {
+  color: #ffeb3b;
+  text-shadow: 0 0 30px rgba(255, 235, 59, 1), 0 0 60px rgba(255, 152, 0, 0.8);
+}
+
+.result-lose #matchResultTitle {
+  color: #4facfe;
+  text-shadow: 0 0 30px rgba(79, 172, 254, 1), 0 0 60px rgba(0, 0, 255, 0.8);
+}
+
+@keyframes resultPop {
+  0% {
+    transform: scale(0.1) rotate(-20deg);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.2) rotate(10deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
